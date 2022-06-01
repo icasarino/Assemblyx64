@@ -1,0 +1,3 @@
+ -- The system call number is put in rax.
+ -- Arguments are put in the registers rdi, rsi, rdx, rcx, r8 and r9, in that order.
+

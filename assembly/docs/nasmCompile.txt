@@ -1,0 +1,4 @@
+nasmCompile <src.s> <out_exe> <format>
+
+example: nasmCompile test.s test elf64
+

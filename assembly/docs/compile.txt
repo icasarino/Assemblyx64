@@ -1,0 +1,2 @@
+nasm -f elf64 -o <out.o> <input.s> --> Compile
+ld -o <out_program> <file.o> --> link
