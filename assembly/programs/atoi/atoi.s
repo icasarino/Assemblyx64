@@ -14,11 +14,14 @@ section .data
 	msg		db	"Ingresa un número: ", 0
 	msgLen		equ	$ - msg
 	
-	msg2		db	"Escribiste: ", 0
+	msg2		db	"El siguiente número es: ", 0
 	msgLen2		equ	$ - msg2
 
+	LF		db	10
+	LFLen		equ	$ - LF
+	
 section .bss
-	inputLen	equ	150
+	inputLen	equ	8
 	input		resq	inputLen
 	input2		resq	inputLen
 
@@ -39,9 +42,75 @@ _start:
 	mov rax, input
 	call atoi ; convierte array char numerico en int
 		
-	add rdx, 1 ; suma 1 al input
+	add rax, 1 ; suma 1 al input
+	call itoa ; El número queda en el stack con un 0x0 al final
 	
+	mov [input2], rax
+
+	push msgLen2
+	push msg2
+	call _print
+	
+	push inputLen
+	push input2
+	call _print
+
+	push LFLen
+	push LF
+	call _print
+	
+
 	call _exit
+
+
+
+itoa:
+	mov rbp, rsp
+	xor r15, r15
+	pop r15
+	push 0x0
+	l3:
+		xor rdx, rdx
+		mov rbx, 10
+		idiv rbx ; divide RAX por RBX y guarda el resto en RDX
+		
+		add dl, 0x30 ; Tomo el resto y le sumo 0x30 para convertirlo en char
+		push rdx
+				
+		cmp rax,0x0
+		jne l3
+	mov r14, rsp
+	xor rax, rax
+	mov rbx, 0x100
+
+	fromStack:
+		add rax, [rsp]
+		imul rbx
+		add rsp,0x8
+		mov rcx, [rsp]
+		cmp rcx, 0x0	
+		jne fromStack
+	
+	idiv rbx
+	xor rcx, rcx
+	reverse:
+		idiv rbx
+		add rcx,rdx
+		push rax
+		mov rax, rcx
+		imul rbx
+		mov rcx, rax
+		pop rax
+		cmp rax,0x0
+		jne reverse
+		
+	mov rax, rcx
+	idiv rbx
+	mov rsp,r14
+	push r15
+	ret
+
+
 
 atoi:
 	xor rcx, rcx
@@ -63,6 +132,7 @@ atoi:
 		cmp rcx,0x00
 		jne l2
 
+	mov rax, rdx
 	ret
 
 
@@ -89,6 +159,8 @@ len:
 	
 	dec rcx
 	ret
+
+
 
 _exit:
 
